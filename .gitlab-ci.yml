@@ -45,9 +45,9 @@ build:
     - |
       for TAG in $TAGS; do
         docker tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} ${CI_REGISTRY_IMAGE}:${TAG}
-        #docker tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} jitesoft/keybase:${TAG}
+        docker tag ${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA} jitesoft/keybase:${TAG}
         docker push ${CI_REGISTRY_IMAGE}:${TAG}
-        #docker push jitesoft/keybase:${TAG}
+        docker push jitesoft/keybase:${TAG}
       done
 
 scan:
