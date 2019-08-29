@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/jitesoft/dockerfiles/ubuntu:latest
+FROM registry.gitlab.com/jitesoft/dockerfiles/ubuntu:bionic
 LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
       maintainer.org="Jitesoft" \
       maintainer.org.uri="https://jitesoft.com" \
@@ -14,8 +14,9 @@ RUN cd /tmp \
  && apt-get update -y \
  && dpkg -i keybase_amd64.deb || true \
  && rm keybase_amd64.deb \
- && apt-get install -fy \
+ && apt-get install --no-install-recommends -fy \
  && apt-get autoremove -y \
+ && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \
  && useradd -s /bin/bash -m keybase \
  && chmod +x /usr/bin/entrypoint
