@@ -13,7 +13,7 @@ COPY ./entrypoint /usr/bin/
 RUN cd /tmp \
  && dpkg -i keybase_amd64.deb || true \
  && rm keybase_amd64.deb \
- && apt-get install --no-install-recommends -y \
+ && apt-get install --no-install-recommends -fy \
  && apt-get autoremove -y \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \
