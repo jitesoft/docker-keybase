@@ -15,9 +15,9 @@ download:
   before_script:
     - apk add --no-cache gnupg curl grep
     - |
-      gpg --keyserver pgp.mit.edu --recv-keys "${GPG_KEY}" ||
-      gpg --keyserver keyserver.pgp.com --recv-keys "${GPG_KEY}" ||
-      gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "${GPG_KEY}"
+      gpg --keyserver pgp.mit.edu --recv-keys "${FINGERPRINT}" ||
+      gpg --keyserver keyserver.pgp.com --recv-keys "${FINGERPRINT}" ||
+      gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "${FINGERPRINT}"
   script:
     - curl -OsS https://prerelease.keybase.io/keybase_amd64.deb
     - curl -OsS https://prerelease.keybase.io/keybase_amd64.deb.sig
