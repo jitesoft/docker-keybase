@@ -8,8 +8,6 @@ stages:
 build:
   stage: build
   image: registry.gitlab.com/jitesoft/dockerfiles/docker:latest
-  dependencies:
-    - download
   variables:
     DOCKER_BUILDKIT: 1
   before_script:
