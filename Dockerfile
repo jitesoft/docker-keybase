@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/jitesoft/dockerfiles/ubuntu:bionic
+FROM registry.gitlab.com/jitesoft/dockerfiles/debian:10-slim
 LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
       maintainer.org="Jitesoft" \
       maintainer.org.uri="https://jitesoft.com" \
@@ -11,7 +11,6 @@ COPY ./keybase_amd64.deb /tmp/keybase_amd64.deb
 COPY ./entrypoint /usr/bin/
 
 RUN cd /tmp \
- && apt-get update -y \
  && dpkg -i keybase_amd64.deb || true \
  && rm keybase_amd64.deb \
  && apt-get install --no-install-recommends -fy \
