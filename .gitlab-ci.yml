@@ -7,6 +7,7 @@ stages:
   - scan
 
 download:
+  stage: download
   image: registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
   variables:
     FINGERPRINT: "222B85B0F90BE2D24CFEB93F47484E50656D16C7"
@@ -26,6 +27,7 @@ download:
       - keybase_amd64.deb
 
 build:
+  stage: build
   image: registry.gitlab.com/jitesoft/dockerfiles/docker:latest
   dependencies:
     - download
