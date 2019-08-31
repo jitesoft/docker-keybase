@@ -18,7 +18,7 @@ Tags follow the keybase version numbering standard (prefixed with `v`) and the l
 * `registry.gitlab.com/jitesoft/dockerfiles/keybase`
   * `latest`, `v4.3.2`
 
-### GitLab
+### Quay.io
 
 * `quay.io/jitesoft/keybase`
   * `latest`, `v4.3.2`
