@@ -18,6 +18,11 @@ Tags follow the keybase version numbering standard (prefixed with `v`) and the l
 * `registry.gitlab.com/jitesoft/dockerfiles/keybase`
   * `latest`, `v4.3.2`
 
+### GitLab
+
+* `quay.io/jitesoft/keybase`
+  * `latest`, `v4.3.2`
+
 Dockerfile can be found at [GitLab](https://gitlab.com/jitesoft/dockerfiles/keybase) and [GitHub](https://github.com/jitesoft/docker-keybase).
 
 ### Image labels
