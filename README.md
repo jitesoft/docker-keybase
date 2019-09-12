@@ -1,5 +1,6 @@
 # Keybase
 
+[![Docker Pulls](https://img.shields.io/docker/pulls/jitesoft/keybase.svg)](https://cloud.docker.com/u/jitesoft/repository/docker/jitesoft/keybase)
 [![Back project](https://img.shields.io/badge/Open%20Collective-Tip%20the%20devs!-blue.svg)](https://opencollective.com/jitesoft-open-source)
 [![pipeline status](https://gitlab.com/jitesoft/dockerfiles/keybase/badges/master/pipeline.svg)](https://gitlab.com/jitesoft/dockerfiles/keybase/commits/master)
 
