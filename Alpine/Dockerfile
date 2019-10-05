@@ -1,5 +1,4 @@
 # syntax = docker/dockerfile:experimental
-ARG BUILDPLATFORM
 FROM --platform=$BUILDPLATFORM registry.gitlab.com/jitesoft/dockerfiles/go:latest AS stage0
 ARG TARGETARCH
 ARG VERSION="v4.5.0"
