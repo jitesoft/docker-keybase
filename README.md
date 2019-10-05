@@ -1,6 +1,6 @@
 # Keybase
 
-[![Docker Pulls](https://img.shields.io/docker/pulls/jitesoft/keybase.svg)](https://cloud.docker.com/u/jitesoft/repository/docker/jitesoft/keybase)
+[![Docker Pulls](https://img.shields.io/docker/pulls/jitesoft/keybase.svg)](https://hub.docker.com/r/jitesoft/keybase)
 [![Back project](https://img.shields.io/badge/Open%20Collective-Tip%20the%20devs!-blue.svg)](https://opencollective.com/jitesoft-open-source)
 [![pipeline status](https://gitlab.com/jitesoft/dockerfiles/keybase/badges/master/pipeline.svg)](https://gitlab.com/jitesoft/dockerfiles/keybase/commits/master)
 
@@ -8,7 +8,8 @@ This image contains the [Keybase](https://keybase.io/) application running on ub
 
 ## Tags
 
-Tags follow the keybase version numbering standard (prefixed with `v`) and the latest version is also tagged `latest`.
+Tags follow the keybase version numbering standard (prefixed with `v`) and the latest version is also tagged `latest`.  
+Alpine tags are based on current [repository](https://github.com/keybase/client/) commit sha hash and is built from source.
 
 ### Docker Hub
 
@@ -18,6 +19,8 @@ Tags follow the keybase version numbering standard (prefixed with `v`) and the l
 
 * `registry.gitlab.com/jitesoft/dockerfiles/keybase`
   * `latest`, `v4.3.2`
+* `registry.gitlab.com/jitesoft/dockerfiles/keybase/alpine`
+  * `latest`, `<hash>`
 
 ### Quay.io
 
