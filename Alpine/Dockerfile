@@ -1,6 +1,9 @@
-FROM registry.gitlab.com/jitesoft/dockerfiles/go:latest AS stage0
+# syntax = docker/dockerfile:experimental
+FROM --platform=$BUILDPLATFORM registry.gitlab.com/jitesoft/dockerfiles/go:latest AS stage0
+ARG TARGETARCH
 ENV GO15VENDOREXPERIMENT=1 \
-    CGO_ENABLED=1
+    CGO_ENABLED=1 \
+    GOARCH="${TARGETARCH}"
 
 COPY ./entrypoint /usr/local/bin/
 
@@ -8,7 +11,7 @@ RUN apk add --no-cache --virtual .build-deps tar curl grep gcc libstdc++ build-b
  && cd ${GOPATH} \
  && go get github.com/keybase/client/go/keybase \
  && chmod -R +x /usr/local/bin \
- && go install -v -a -tags production github.com/keybase/client/go/keybase \
+ && go build -v -a -tags production github.com/keybase/client/go/keybase \
  && mv ${GOPATH}/bin/keybase /usr/local/bin/keybase
 
 FROM registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
