@@ -34,10 +34,10 @@ build:alpine:
     DOCKER_BUILDKIT: 1
   script:
     - cd Alpine/
-    - HASH=$(wget -qO- https://github.com/keybase/client | tr -d '\n' | tr -d ' ' | grep -oP '(?<=commit-tease-sha).*[>]([\da-f]+)(?=<)' | grep -oP '(?<=\>)([\da-f]+)' | awk 'NR==1{print $1}')
-    - TAG_LIST=$(helper "${CI_REGISTRY_IMAGE}/alpine" "latest,${HASH}")
+    - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
+    - TAG_LIST=$(helper "${CI_REGISTRY_IMAGE}/alpine" "latest,${VERSION}")
 #    - TAG_LIST="$(helper "itesoft/keybase" "latest-alpine,${HASH}-alpine") ${TAG_LIST}"
-    - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg KB_HASH="${HASH}" --progress plain --push ${TAG_LIST} .
+    - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg VERSION="${VERSION}" --progress plain --push ${TAG_LIST} .
   tags: [ jitesoft, arm64, amd64, buildx ]
 
 scan:
