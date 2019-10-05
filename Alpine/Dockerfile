@@ -1,10 +1,11 @@
-FROM registry.gitlab.com/jitesoft/dockerfiles/go:latest AS stage0
+# syntax = docker/dockerfile:experimental
+ARG BUILDPLATFORM
+FROM --platform=$BUILDPLATFORM registry.gitlab.com/jitesoft/dockerfiles/go:latest AS stage0
 ARG TARGETARCH
 ARG VERSION="v4.5.0"
 ENV GO15VENDOREXPERIMENT=1 \
     CGO_ENABLED=1 \
     GOARCH="${TARGETARCH}"
-
 
 RUN apk add --no-cache --virtual .build-deps tar curl grep gcc libstdc++ build-base binutils-gold xz \
  && mkdir -p ${GOPATH}/src/github.com/keybase/client \
@@ -14,7 +15,7 @@ RUN apk add --no-cache --virtual .build-deps tar curl grep gcc libstdc++ build-b
  && mv ./keybase /usr/local/bin/keybase
 
 FROM registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
-ARG KB_HASH
+ARG VERSION
 LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
       maintainer.org="Jitesoft" \
       maintainer.org.uri="https://jitesoft.com" \
