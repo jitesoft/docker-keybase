@@ -1,17 +1,18 @@
 # syntax = docker/dockerfile:experimental
 FROM --platform=$BUILDPLATFORM registry.gitlab.com/jitesoft/dockerfiles/go:latest AS stage0
 ARG TARGETARCH
+ARG VERSION="v4.5.0"
 ENV GO15VENDOREXPERIMENT=1 \
     CGO_ENABLED=1 \
     GOARCH="${TARGETARCH}"
 
 COPY ./entrypoint /usr/local/bin/
 
-RUN apk add --no-cache --virtual .build-deps tar curl grep gcc libstdc++ build-base binutils-gold \
- && cd ${GOPATH} \
- && go get github.com/keybase/client/go/keybase \
- && chmod -R +x /usr/local/bin \
- && go build -v -a -tags production github.com/keybase/client/go/keybase \
+RUN apk add --no-cache --virtual .build-deps tar curl grep gcc libstdc++ build-base binutils-gold xz \
+ && mkdir -p ${GOPATH}/src/github.com/keybase/client
+RUN curl -L https://github.com/keybase/client/releases/download/${VERSION}/keybase-${VERSION}.tar.xz -o /tmp/keybase.tar.xz
+RUN tar -Jxf /tmp/keybase.tar.xz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1
+RUN go install -v -a -tags production github.com/keybase/client/go/keybase \
  && mv ${GOPATH}/bin/keybase /usr/local/bin/keybase
 
 FROM registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
@@ -23,9 +24,7 @@ LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
       com.jitesoft.project.repo.uri="https://gitlab.com/jitesoft/dockerfiles/keybase" \
       com.jitesoft.project.repo.issues="https://gitlab.com/jitesoft/dockerfiles/keybase/issues" \
       com.jitesoft.project.registry.uri="registry.gitlab.com/jitesoft/dockerfiles/keybase" \
-      com.jitesoft.app.keybase.hash="${KB_HASH}"
-
-
+      com.jitesoft.app.keybase.version="${VERSION}"
 
 COPY --from=stage0 /usr/local/bin /usr/local/bin/
 
