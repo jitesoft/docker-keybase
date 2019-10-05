@@ -11,6 +11,8 @@ This image contains the [Keybase](https://keybase.io/) application running on ub
 Tags follow the keybase version numbering standard (prefixed with `v`) and the latest version is also tagged `latest`.  
 Alpine tags are based on current [repository](https://github.com/keybase/client/) commit sha hash and is built from source.
 
+All built for AMD64 and ARM64.
+
 ### Docker Hub
 
 * `latest`, `v4.3.2`

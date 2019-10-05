@@ -38,6 +38,7 @@ build:alpine:
     - TAG_LIST=$(helper "${CI_REGISTRY_IMAGE}/alpine" "latest,${HASH}")
 #    - TAG_LIST="$(helper "itesoft/keybase" "latest-alpine,${HASH}-alpine") ${TAG_LIST}"
     - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg KB_HASH="${HASH}" --progress plain --push ${TAG_LIST} .
+  tags: [ jitesoft, arm64, amd64, buildx ]
 
 scan:
   extends: .container_scanning
