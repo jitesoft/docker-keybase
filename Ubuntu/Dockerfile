@@ -7,10 +7,10 @@ ENV CGO_ENABLED=1 \
 
 RUN apt-get update \
  && apt-get install -y curl tar xz-utils gcc \
- && mkdir -p ${GOPATH}/src/github.com/keybase/client \
+ && mkdir -p "${GOPATH}/src/github.com/keybase/client" \
  && curl -L https://github.com/keybase/client/releases/download/${VERSION}/keybase-${VERSION}.tar.xz -o /tmp/keybase.tar.xz \
  && tar -Jxf /tmp/keybase.tar.xz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1 \
- && if [ "${GOARCH}" == "arm64" ]; then \
+ && if [ "${GOARCH}" = "arm64" ]; then \
         apt-get install -y gcc-aarch64-linux-gnu; \
         export CC="/usr/bin/aarch64-linux-gnu-gcc"; \
         echo "Building for AARCH64"; \
