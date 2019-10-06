@@ -30,7 +30,7 @@ LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
       com.jitesoft.project.registry.uri="registry.gitlab.com/jitesoft/dockerfiles/keybase" \
       com.jitesoft.app.keybase.version="${VERSION}"
 
-COPY --from=stage0 /usr/local/bin /usr/local/bin/
+COPY --from=stage0 /usr/local/bin/keybase /usr/local/bin/keybase
 COPY ./entrypoint /usr/local/bin/
 
 RUN addgroup -g 1000 keybase \
