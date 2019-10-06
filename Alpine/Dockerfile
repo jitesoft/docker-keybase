@@ -14,6 +14,7 @@ RUN apk add --no-cache --virtual .build-deps tar curl gcc libstdc++ build-base b
         curl -L https://musl.cc/aarch64-linux-musl-cross.tgz -o /tmp/compiler.tar.gz; \
         tar -xzf /tmp/compiler.tar.gz -C /usr --strip-components=2; \
         export CC="/usr/bin/aarch64-linux-musl-gcc"; \
+        echo "Building for AARCH64."; \
     fi \
  && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -tags production github.com/keybase/client/go/keybase \
  && mv ./keybase /usr/local/bin/keybase \
