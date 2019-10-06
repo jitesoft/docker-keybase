@@ -6,7 +6,7 @@ ENV GO15VENDOREXPERIMENT=1 \
     CGO_ENABLED=1 \
     GOARCH="${TARGETARCH}"
 
-RUN apk add --no-cache --virtual .build-deps tar curl gcc libstdc++ build-base binutils-gold \
+RUN apk add --no-cache --virtual .build-deps tar curl gcc libstdc++ build-base binutils-gold xz \
  && mkdir -p ${GOPATH}/src/github.com/keybase/client \
  && curl -L https://github.com/keybase/client/releases/download/${VERSION}/keybase-${VERSION}.tar.xz -o /tmp/keybase.tar.xz \
  && tar -Jxf /tmp/keybase.tar.xz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1 \
