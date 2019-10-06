@@ -32,11 +32,12 @@ LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
       com.jitesoft.app.keybase.version="${VERSION}"
 
 COPY --from=stage0 /usr/local/bin/keybase /usr/local/bin/keybase
-COPY ./entrypoint /usr/local/bin/
+COPY ./entrypoint /usr/bin/entrypoint
 
 RUN addgroup -g 1000 keybase \
  && adduser -u 1000 -G keybase -s /bin/sh -D keybase \
- && chmod +x /usr/local/bin \
+ && chmod +x /usr/local/bin/keybase \
+ && chmod +x /usr/bin/entrypoint \
  && keybase --version
 
 USER keybase
