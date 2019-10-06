@@ -10,7 +10,7 @@ RUN apk add --no-cache --virtual .build-deps tar curl gcc libstdc++ build-base b
  && mkdir -p ${GOPATH}/src/github.com/keybase/client \
  && curl -L https://github.com/keybase/client/releases/download/${VERSION}/keybase-${VERSION}.tar.xz -o /tmp/keybase.tar.xz \
  && tar -Jxf /tmp/keybase.tar.xz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1 \
- && if [ "${TARGETARCH}" == "arm64" ]; then \
+ && if [ "${GOARCH}" == "arm64" ]; then \
         curl -L https://musl.cc/aarch64-linux-musl-cross.tgz -o /tmp/compiler.tar.gz; \
         tar -xzf /tmp/compiler.tar.gz -C /usr --strip-components=2; \
         export CC="/usr/bin/aarch64-linux-musl-gcc"; \
