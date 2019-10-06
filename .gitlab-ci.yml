@@ -14,8 +14,11 @@ build:
     - cd Ubuntu/
     - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
     - TAG_LIST=$(helper "${CI_REGISTRY_IMAGE}" "latest,${VERSION}")
-   # - TAG_LIST="$(helper "jitesoft/keybase" "latest,${VERSION}") ${TAG_LIST}"
+    - TAG_LIST="$(helper "jitesoft/keybase" "latest,${VERSION}") ${TAG_LIST}"
     - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg VERSION="${VERSION}" --progress plain --push ${TAG_LIST} .
+    - docker pull ${CI_REGISTRY_IMAGE}:latest
+    - helper multitag ${CI_REGISTRY_IMAGE}:latest quay.io/jitesoft/keybase:latest quay.io/jitesoft/keybase:${VERSION}
+    - helper multipush quay.io/jitesoft/keybase:latest quay.io/jitesoft/keybase:${VERSION}
   tags: [ jitesoft, arm64, amd64, buildx ]
 
 build:alpine:
@@ -30,8 +33,8 @@ build:alpine:
     - TAG_LIST="$(helper "jitesoft/keybase" "latest-alpine,${VERSION}-alpine") ${TAG_LIST}"
     - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg VERSION="${VERSION}" --progress plain --push ${TAG_LIST} .
     - docker pull ${CI_REGISTRY_IMAGE}/alpine:latest
-    - helper multitag ${CI_REGISTRY_IMAGE}/alpine:latest quey.io/jitesoft/keybase:alpine-latest quey.io/jitesoft/keybase:alpine-${VERSION}
-    - helper multipush quey.io/jitesoft/keybase:alpine-latest quey.io/jitesoft/keybase:alpine-${VERSION}
+    - helper multitag ${CI_REGISTRY_IMAGE}/alpine:latest quay.io/jitesoft/keybase:alpine-latest quay.io/jitesoft/keybase:alpine-${VERSION}
+    - helper multipush quay.io/jitesoft/keybase:alpine-latest quay.io/jitesoft/keybase:alpine-${VERSION}
   tags: [ jitesoft, arm64, amd64, buildx ]
 
 scan:
