@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:experimental
- FROM --platform=$BUILDPLATFORM registry.gitlab.com/jitesoft/dockerfiles/go:latest AS stage0
+FROM --platform=$BUILDPLATFORM registry.gitlab.com/jitesoft/dockerfiles/go:latest AS stage0
 ARG TARGETARCH
-ARG VERSION="v4.5.0"
+ARG VERSION
 ENV GO15VENDOREXPERIMENT=1 \
     CGO_ENABLED=1 \
     GOARCH="${TARGETARCH}"

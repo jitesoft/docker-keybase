@@ -8,27 +8,27 @@ This image contains the [Keybase](https://keybase.io/) application running on ub
 
 ## Tags
 
-Tags follow the keybase version numbering standard (prefixed with `v`) and the latest version is also tagged `latest`.  
-Alpine tags are based on current [repository](https://github.com/keybase/client/) commit sha hash and is built from source.
-
-All built for AMD64 and ARM64.
+Tags follow the keybase version numbering standard (prefixed with `v`) and the latest version is also tagged `latest`.    
+Keybase is built from source for amd64 and arm64/aarch64
 
 ### Docker Hub
 
-* `latest`, `v4.3.2`
+* `latest`, `v4.5.0`
+* `latest-alpine`, `v4.5.0-alpine`
 
 ### GitLab
 
 * `registry.gitlab.com/jitesoft/dockerfiles/keybase`
-  * `latest`, `v4.3.2`
+  * `latest`, `v4.5.0`
 * `registry.gitlab.com/jitesoft/dockerfiles/keybase/alpine`
-  * `latest`, `<hash>`
+  * `latest`, `v4.5.0`
 
 ### Quay.io
 
 * `quay.io/jitesoft/keybase`
-  * `latest`, `v4.3.2`
-
+  * `latest`, `v4.5.0`
+  * `latest-alpine`, `v4.5.0-alpine`
+  
 Dockerfile can be found at [GitLab](https://gitlab.com/jitesoft/dockerfiles/keybase) and [GitHub](https://github.com/jitesoft/docker-keybase).
 
 ### Image labels
