@@ -6,8 +6,7 @@ ENV GO15VENDOREXPERIMENT=1 \
     CGO_ENABLED=1 \
     GOARCH="${TARGETARCH}"
 
-RUN printf "\nhttps://ftp.acc.umu.se/mirror/alpinelinux.org/edge/testing" >> /etc/apk/repositories \
- && apk add --no-cache --virtual .build-deps tar curl grep gcc libstdc++ build-base binutils-gold xz \
+RUN apk add --no-cache --virtual .build-deps tar curl gcc libstdc++ build-base binutils-gold \
  && mkdir -p ${GOPATH}/src/github.com/keybase/client \
  && curl -L https://github.com/keybase/client/releases/download/${VERSION}/keybase-${VERSION}.tar.xz -o /tmp/keybase.tar.xz \
  && tar -Jxf /tmp/keybase.tar.xz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1 \
@@ -17,7 +16,8 @@ RUN printf "\nhttps://ftp.acc.umu.se/mirror/alpinelinux.org/edge/testing" >> /et
         export CC="/usr/bin/aarch64-linux-musl-gcc"; \
     fi \
  && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -tags production github.com/keybase/client/go/keybase \
- && mv ./keybase /usr/local/bin/keybase
+ && mv ./keybase /usr/local/bin/keybase \
+ && apk del .build-deps
 
 FROM registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
 ARG VERSION
@@ -35,7 +35,8 @@ COPY ./entrypoint /usr/local/bin/
 
 RUN addgroup -g 1000 keybase \
  && adduser -u 1000 -G keybase -s /bin/sh -D keybase \
- && chmod +x /usr/local/bin
+ && chmod +x /usr/local/bin \
+ && keybase --version
 
 USER keybase
 ENTRYPOINT ["entrypoint"]
