@@ -1,16 +1,22 @@
 # syntax = docker/dockerfile:experimental
-FROM --platform=$BUILDPLATFORM registry.gitlab.com/jitesoft/dockerfiles/go:latest AS stage0
+ FROM --platform=$BUILDPLATFORM registry.gitlab.com/jitesoft/dockerfiles/go:latest AS stage0
 ARG TARGETARCH
 ARG VERSION="v4.5.0"
 ENV GO15VENDOREXPERIMENT=1 \
     CGO_ENABLED=1 \
     GOARCH="${TARGETARCH}"
 
-RUN apk add --no-cache --virtual .build-deps tar curl grep gcc libstdc++ build-base binutils-gold xz \
+RUN printf "\nhttps://ftp.acc.umu.se/mirror/alpinelinux.org/edge/testing" >> /etc/apk/repositories \
+ && apk add --no-cache --virtual .build-deps tar curl grep gcc libstdc++ build-base binutils-gold xz \
  && mkdir -p ${GOPATH}/src/github.com/keybase/client \
  && curl -L https://github.com/keybase/client/releases/download/${VERSION}/keybase-${VERSION}.tar.xz -o /tmp/keybase.tar.xz \
  && tar -Jxf /tmp/keybase.tar.xz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1 \
- && go build -v -a -tags production github.com/keybase/client/go/keybase \
+ && if [ "${TARGETARCH}" == "arm64" ]; then \
+        curl -L https://musl.cc/aarch64-linux-musl-cross.tgz -o /tmp/compiler.tar.gz; \
+        tar -xzf /tmp/compiler.tar.gz -C /usr --strip-components=2; \
+        export CC="/usr/bin/aarch64-linux-musl-gcc"; \
+    fi \
+ && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -tags production github.com/keybase/client/go/keybase \
  && mv ./keybase /usr/local/bin/keybase
 
 FROM registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
