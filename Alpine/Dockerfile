@@ -10,18 +10,17 @@ RUN apk add --no-cache --virtual .build-deps tar curl gcc libstdc++ build-base b
  && mkdir -p ${GOPATH}/src/github.com/keybase/client \
  && curl -L https://github.com/keybase/client/releases/download/${VERSION}/keybase-${VERSION}.tar.xz -o /tmp/keybase.tar.xz \
  && tar -Jxf /tmp/keybase.tar.xz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1 \
+ && BUILDMODE="-buildmode=pie"
  && if [ "${GOARCH}" == "arm64" ]; then \
+        BUILDMODE="" \
         curl -L https://musl.cc/aarch64-linux-musl-cross.tgz -o /tmp/compiler.tar.gz; \
         tar -xzf /tmp/compiler.tar.gz -C /usr --strip-components=2; \
         export CC="/usr/bin/aarch64-linux-musl-gcc"; \
         echo "Building for AARCH64."; \
     fi \
  && cd bin \
- && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/keybase \
- && go build -v -a -ldflags "-linkmode external -s -w" -buildmode=pie -tags production github.com/keybase/client/go/kbfs/redirector \
-# && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/kbnm \
-# && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/kbfs/kbfsfuse \
-# && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/kbfs/kbfsgit/git-remote-keybase \
+ && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/keybase \
+ && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/redirector \
  && mv * /usr/local/bin \
  && apk del .build-deps
 
