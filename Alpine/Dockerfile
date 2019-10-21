@@ -16,8 +16,13 @@ RUN apk add --no-cache --virtual .build-deps tar curl gcc libstdc++ build-base b
         export CC="/usr/bin/aarch64-linux-musl-gcc"; \
         echo "Building for AARCH64."; \
     fi \
- && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -tags production github.com/keybase/client/go/keybase \
- && mv ./keybase /usr/local/bin/keybase \
+ && cd bin \
+ && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/keybase \
+ && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/kbfs/redirector \
+# && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/kbnm \
+# && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/kbfs/kbfsfuse \
+# && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/kbfs/kbfsgit/git-remote-keybase \
+ && mv * /usr/local/bin \
  && apk del .build-deps
 
 FROM registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
@@ -31,12 +36,12 @@ LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
       com.jitesoft.project.registry.uri="registry.gitlab.com/jitesoft/dockerfiles/keybase" \
       com.jitesoft.app.keybase.version="${VERSION}"
 
-COPY --from=stage0 /usr/local/bin/keybase /usr/local/bin/keybase
+COPY --from=stage0 /usr/local/bin /usr/local/bin
 COPY ./entrypoint /usr/bin/entrypoint
 
 RUN addgroup -g 1000 keybase \
  && adduser -u 1000 -G keybase -s /bin/sh -D keybase \
- && chmod +x /usr/local/bin/keybase \
+ && chmod -R +x /usr/local/bin \
  && chmod +x /usr/bin/entrypoint \
  && keybase --version
 

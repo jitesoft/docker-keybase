@@ -15,8 +15,10 @@ RUN apt-get update \
         export CC="/usr/bin/aarch64-linux-gnu-gcc"; \
         echo "Building for AARCH64"; \
     fi \
- && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w " -tags production github.com/keybase/client/go/keybase \
- && mv keybase /usr/local/bin/keybase
+ && cd bin \
+ && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/keybase \
+ && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/kbfs/redirector \
+ && mv * /usr/local/bin
 
 FROM registry.gitlab.com/jitesoft/dockerfiles/ubuntu:bionic
 ARG VERSION
@@ -29,12 +31,12 @@ LABEL maintainer="Johannes Tegnér <johannes@jitesoft.com>" \
       com.jitesoft.project.registry.uri="registry.gitlab.com/jitesoft/dockerfiles/keybase" \
       com.jitesoft.app.keybase.version="${VERSION}"
 
-COPY --from=stage0 /usr/local/bin/keybase /usr/local/bin/keybase
+COPY --from=stage0 /usr/local/bin /usr/local/bin
 COPY ./entrypoint /usr/bin/entrypoint
 
 RUN  useradd -u 1000 -s /bin/bash -m keybase \
  && chmod +x /usr/bin/entrypoint \
- && chmod +x /usr/local/bin/keybase \
+ && chmod -R +x /usr/local/bin \
  && keybase --version
 
 USER keybase
