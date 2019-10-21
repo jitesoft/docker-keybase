@@ -21,6 +21,7 @@ RUN apk add --no-cache --virtual .build-deps tar curl gcc libstdc++ build-base b
  && cd bin \
  && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/keybase \
  && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/redirector \
+ && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/kbfsfuse \
  && mv * /usr/local/bin \
  && apk del .build-deps
 

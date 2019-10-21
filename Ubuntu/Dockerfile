@@ -18,6 +18,7 @@ RUN apt-get update \
  && cd bin \
  && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/keybase \
  && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/kbfs/redirector \
+ && go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" -buildmode=pie -tags production github.com/keybase/client/go/kbfs/kbfsfuse \
  && mv * /usr/local/bin
 
 FROM registry.gitlab.com/jitesoft/dockerfiles/ubuntu:bionic
