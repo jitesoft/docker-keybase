@@ -12,7 +12,7 @@ build:
     DOCKER_BUILDKIT: 1
   script:
     - cd Ubuntu/
-    - VERSION="v4.6.0" #VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
+    - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
     - TAG_LIST=$(helper "${CI_REGISTRY_IMAGE}" "latest,${VERSION}")
     - TAG_LIST="$(helper "jitesoft/keybase" "latest,${VERSION}") ${TAG_LIST}"
     - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg VERSION="${VERSION}" --progress plain --push ${TAG_LIST} .
@@ -28,7 +28,7 @@ build:alpine:
     DOCKER_BUILDKIT: 1
   script:
     - cd Alpine/
-    - VERSION="v4.6.0" #VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
+    - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
     - TAG_LIST=$(helper "${CI_REGISTRY_IMAGE}/alpine" "latest,${VERSION}")
     - TAG_LIST="$(helper "jitesoft/keybase" "latest-alpine,${VERSION}-alpine") ${TAG_LIST}"
     - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg VERSION="${VERSION}" --progress plain --push ${TAG_LIST} .
