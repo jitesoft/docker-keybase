@@ -107,7 +107,7 @@ containerize:ubuntu:
     - VERSION=$(cat binaries/version.txt)
     - TAG_LIST=$(helper "${CI_REGISTRY_IMAGE}" "latest,${VERSION}")
     - TAG_LIST="$(helper "jitesoft/keybase" "latest,${VERSION}") ${TAG_LIST}"
-    - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg VERSION="${VERSION}"  -f ubuntu/Dockerfile --progress plain --push ${TAG_LIST} .
+    - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg VERSION="${VERSION}" -f Ubuntu/Dockerfile --progress plain --push ${TAG_LIST} .
     - docker pull ${CI_REGISTRY_IMAGE}:latest
     - helper multitag ${CI_REGISTRY_IMAGE}:latest quay.io/jitesoft/keybase:latest quay.io/jitesoft/keybase:${VERSION}
     - helper multipush quay.io/jitesoft/keybase:latest quay.io/jitesoft/keybase:${VERSION}
@@ -122,7 +122,7 @@ containerize:alpine:
     - VERSION=$(cat binaries/version.txt)
     - TAG_LIST=$(helper "${CI_REGISTRY_IMAGE}/alpine" "latest,${VERSION}")
     - TAG_LIST="$(helper "jitesoft/keybase" "latest-alpine,${VERSION}-alpine") ${TAG_LIST}"
-    - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg VERSION="${VERSION}" -f alpine/Dockerfile --progress plain --push ${TAG_LIST} .
+    - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg VERSION="${VERSION}" -f Alpine/Dockerfile --progress plain --push ${TAG_LIST} .
     - docker pull ${CI_REGISTRY_IMAGE}/alpine:latest
     - helper multitag ${CI_REGISTRY_IMAGE}/alpine:latest quay.io/jitesoft/keybase:alpine-latest quay.io/jitesoft/keybase:alpine-${VERSION}
     - helper multipush quay.io/jitesoft/keybase:alpine-latest quay.io/jitesoft/keybase:alpine-${VERSION}
