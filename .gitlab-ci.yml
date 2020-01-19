@@ -9,6 +9,7 @@ stages:
   - notify
 
 .build:alpine:
+  stage: build
   image: registry.gitlab.com/jitesoft/dockerfiles/go:latest
   before_script:
     - export CGO_ENABLED=1
@@ -49,6 +50,7 @@ build:alpine:arm:
     - native-aarch64
 
 .build:ubuntu:
+  stage: build
   image: registry.gitlab.com/jitesoft/dockerfiles/go/ubuntu:latest
   before_script:
     - export CGO_ENABLED=1
