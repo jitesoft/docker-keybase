@@ -28,7 +28,7 @@ stages:
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/kbfsfuse
     - cd ${CI_PROJECT_DIR}
     - cp Alpine/entrypoint /usr/local/bin
-    - $(cd /usr/local && tar -czf binaries/${CI_PROJECT_DIR}/keybase-${ARCH}.tar.gz *)
+    - $(cd /usr/local && tar -czf ${CI_PROJECT_DIR}/binaries/keybase-${ARCH}.tar.gz *)
   artifacts:
     paths:
       - binaries
@@ -70,7 +70,7 @@ build:alpine:arm:
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/kbfsfuse
     - cd ${CI_PROJECT_DIR}
     - cp Ubuntu/entrypoint /usr/local/bin
-    - $(cd /usr/local && tar -czf binaries/${CI_PROJECT_DIR}/keybase-${ARCH}.tar.gz *)
+    - $(cd /usr/local && tar -czf ${CI_PROJECT_DIR}/binaries/keybase-${ARCH}.tar.gz *)
   artifacts:
     paths:
       - binaries
