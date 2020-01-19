@@ -27,9 +27,10 @@ stages:
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/keybase
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/redirector
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/kbfsfuse
-    - upx --brute kbfsfuse
-    - upx --brute redirector
-    - upx --brute keybase
+    - upx -5 kbfsfuse
+    - upx -5 redirector
+    - upx -5 keybase
+    - sha256sum * > sha.txt
     - cd ${CI_PROJECT_DIR}
     - cp Alpine/entrypoint out/
     - $(cd out && tar -czf ${CI_PROJECT_DIR}/binaries/keybase-${ARCH}.tar.gz *)
