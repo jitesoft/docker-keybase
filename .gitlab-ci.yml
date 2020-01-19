@@ -13,7 +13,7 @@ stages:
   before_script:
     - export CGO_ENABLED=1
     - export GO15VENDOREXPERIMENT=1
-    - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold xz
+    - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold xz upx
     - mkdir binaries
     - mkdir out
     - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
