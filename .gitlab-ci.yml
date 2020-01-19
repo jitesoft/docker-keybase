@@ -2,7 +2,6 @@ include:
   - https://gitlab.com/jitesoft/gitlab-ci-lib/raw/master/container_scan-v2.yml
 
 stages:
-  - download
   - build
   - containerize
   - scan
@@ -15,8 +14,9 @@ stages:
     - export CGO_ENABLED=1
     - export GO15VENDOREXPERIMENT=1
     - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold xz
+    - mkdir binaries
     - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
-    - echo ${VERSION} > version.txt
+    - echo ${VERSION} > binaries/version.txt
   script:
     - mkdir -p ${GOPATH}/src/github.com/keybase/client
     - curl -L https://github.com/keybase/client/releases/download/${VERSION}/keybase-${VERSION}.tar.xz -o /tmp/keybase.tar.xz
@@ -27,12 +27,11 @@ stages:
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/redirector
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/kbfsfuse
     - cd ${CI_PROJECT_DIR}
-    - cp alpine/entrypoint /usr/local/bin
-    - $(cd /usr/local && tar -czf ${CI_PROJECT_DIR}/keybase-${ARCH}.tar.gz *)
+    - cp Alpine/entrypoint /usr/local/bin
+    - $(cd /usr/local && tar -czf binaries/${CI_PROJECT_DIR}/keybase-${ARCH}.tar.gz *)
   artifacts:
     paths:
-      - version.txt
-      - keybase-${ARCH}.tar.gz
+      - binaries
     expire_in: 3 hours
 
 build:alpine:amd:
@@ -57,8 +56,9 @@ build:alpine:arm:
     - export GO15VENDOREXPERIMENT=1
     - apt-get update
     - apt-get install -y curl tar xz-utils gcc wget
+    - mkdir binaries
     - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
-    - echo ${VERSION} > version.txt
+    - echo ${VERSION} > binaries/version.txt
   script:
     - mkdir -p ${GOPATH}/src/github.com/keybase/client
     - curl -L https://github.com/keybase/client/releases/download/${VERSION}/keybase-${VERSION}.tar.xz -o /tmp/keybase.tar.xz
@@ -69,12 +69,11 @@ build:alpine:arm:
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/redirector
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/kbfsfuse
     - cd ${CI_PROJECT_DIR}
-    - cp ubuntu/entrypoint /usr/local/bin
-    - $(cd /usr/local && tar -czf ${CI_PROJECT_DIR}/keybase-${ARCH}.tar.gz *)
+    - cp Ubuntu/entrypoint /usr/local/bin
+    - $(cd /usr/local && tar -czf binaries/${CI_PROJECT_DIR}/keybase-${ARCH}.tar.gz *)
   artifacts:
     paths:
-      - version.txt
-      - keybase-${ARCH}.tar.gz
+      - binaries
     expire_in: 3 hours
 
 build:ubuntu:amd:
@@ -91,56 +90,53 @@ build:ubuntu:arm:
   tags:
     - native-aarch64
 
-containerize:ubuntu:
-  stage: containerize
-  image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
-  variables:
-    DOCKER_BUILDKIT: 1
-  script:
-    - cd Ubuntu/
-    - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
-    - TAG_LIST=$(helper "${CI_REGISTRY_IMAGE}" "latest,${VERSION}")
-    - TAG_LIST="$(helper "jitesoft/keybase" "latest,${VERSION}") ${TAG_LIST}"
-    - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg VERSION="${VERSION}" --progress plain --push ${TAG_LIST} .
-    - docker pull ${CI_REGISTRY_IMAGE}:latest
-    - helper multitag ${CI_REGISTRY_IMAGE}:latest quay.io/jitesoft/keybase:latest quay.io/jitesoft/keybase:${VERSION}
-    - helper multipush quay.io/jitesoft/keybase:latest quay.io/jitesoft/keybase:${VERSION}
-  tags: [ jitesoft, protected, buildx ]
-
-containerize:alpine:
-  stage: containerize
-  image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
-  variables:
-    DOCKER_BUILDKIT: 1
-  script:
-    - cd Alpine/
-    - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
-    - TAG_LIST=$(helper "${CI_REGISTRY_IMAGE}/alpine" "latest,${VERSION}")
-    - TAG_LIST="$(helper "jitesoft/keybase" "latest-alpine,${VERSION}-alpine") ${TAG_LIST}"
-    - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg VERSION="${VERSION}" --progress plain --push ${TAG_LIST} .
-    - docker pull ${CI_REGISTRY_IMAGE}/alpine:latest
-    - helper multitag ${CI_REGISTRY_IMAGE}/alpine:latest quay.io/jitesoft/keybase:alpine-latest quay.io/jitesoft/keybase:alpine-${VERSION}
-    - helper multipush quay.io/jitesoft/keybase:alpine-latest quay.io/jitesoft/keybase:alpine-${VERSION}
-  tags: [ jitesoft, protected, buildx ]
-
-scan:
-  extends: .container_scanning
-  variables:
-    SCANNING_IMAGE_NAME: "${CI_REGISTRY_IMAGE}:latest"
-
-
-scan:alpine:
-  extends: .container_scanning
-  variables:
-    SCANNING_IMAGE_NAME: "${CI_REGISTRY_IMAGE}/alpine:latest"
-
-trigger_build:
-  image: registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
-  stage: notify
-  before_script:
-    - apk add --no-cache curl
-  script:
-    - curl -X POST -F token=${NOTIFY_TOKEN} -F ref=master https://gitlab.com/api/v4/projects/14119338/trigger/pipeline
-  only:
-    refs:
-      - master
+#containerize:ubuntu:
+#  stage: containerize
+#  image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
+#  variables:
+#    DOCKER_BUILDKIT: 1
+#  script:
+#    - VERSION=$(cat binaries/version.txt)
+#    - TAG_LIST=$(helper "${CI_REGISTRY_IMAGE}" "latest,${VERSION}")
+#    - TAG_LIST="$(helper "jitesoft/keybase" "latest,${VERSION}") ${TAG_LIST}"
+#    - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg VERSION="${VERSION}"  -f ubuntu/Dockerfile --progress plain --push ${TAG_LIST} .
+#    - docker pull ${CI_REGISTRY_IMAGE}:latest
+#    - helper multitag ${CI_REGISTRY_IMAGE}:latest quay.io/jitesoft/keybase:latest quay.io/jitesoft/keybase:${VERSION}
+#    - helper multipush quay.io/jitesoft/keybase:latest quay.io/jitesoft/keybase:${VERSION}
+#  tags: [ jitesoft, protected, buildx ]
+#
+#containerize:alpine:
+#  stage: containerize
+#  image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
+#  variables:
+#    DOCKER_BUILDKIT: 1
+#  script:
+#    - VERSION=$(cat binaries/version.txt)
+#    - TAG_LIST=$(helper "${CI_REGISTRY_IMAGE}/alpine" "latest,${VERSION}")
+#    - TAG_LIST="$(helper "jitesoft/keybase" "latest-alpine,${VERSION}-alpine") ${TAG_LIST}"
+#    - docker buildx build --platform "linux/amd64,linux/arm64" --build-arg VERSION="${VERSION}" -f alpine/Dockerfile --progress plain --push ${TAG_LIST} .
+#    - docker pull ${CI_REGISTRY_IMAGE}/alpine:latest
+#    - helper multitag ${CI_REGISTRY_IMAGE}/alpine:latest quay.io/jitesoft/keybase:alpine-latest quay.io/jitesoft/keybase:alpine-${VERSION}
+#    - helper multipush quay.io/jitesoft/keybase:alpine-latest quay.io/jitesoft/keybase:alpine-${VERSION}
+#  tags: [ jitesoft, protected, buildx ]
+#
+#scan:
+#  extends: .container_scanning
+#  variables:
+#    SCANNING_IMAGE_NAME: "${CI_REGISTRY_IMAGE}:latest"
+#
+#scan:alpine:
+#  extends: .container_scanning
+#  variables:
+#    SCANNING_IMAGE_NAME: "${CI_REGISTRY_IMAGE}/alpine:latest"
+#
+#trigger_build:
+#  image: registry.gitlab.com/jitesoft/dockerfiles/alpine:latest
+#  stage: notify
+#  before_script:
+#    - apk add --no-cache curl
+#  script:
+#    - curl -X POST -F token=${NOTIFY_TOKEN} -F ref=master https://gitlab.com/api/v4/projects/14119338/trigger/pipeline
+#  only:
+#    refs:
+#      - master
