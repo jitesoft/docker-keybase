@@ -2,12 +2,95 @@ include:
   - https://gitlab.com/jitesoft/gitlab-ci-lib/raw/master/container_scan-v2.yml
 
 stages:
+  - download
   - build
+  - containerize
   - scan
   - notify
 
-build:
-  stage: build
+.build:alpine:
+  image: registry.gitlab.com/jitesoft/dockerfiles/go:latest
+  before_script:
+    - export CGO_ENABLED=1
+    - export GO15VENDOREXPERIMENT=1
+    - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold xz
+    - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
+    - echo ${VERSION} > version.txt
+  script:
+    - mkdir -p ${GOPATH}/src/github.com/keybase/client
+    - curl -L https://github.com/keybase/client/releases/download/${VERSION}/keybase-${VERSION}.tar.xz -o /tmp/keybase.tar.xz
+    - tar -Jxf /tmp/keybase.tar.xz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1
+    - BUILDMODE="-buildmode=pie"
+    - cd /usr/local/bin
+    - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/keybase
+    - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/redirector
+    - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/kbfsfuse
+    - cd ${CI_PROJECT_DIR}
+    - cp alpine/entrypoint /usr/local/bin
+    - $(cd /usr/local && tar -czf ${CI_PROJECT_DIR}/keybase-${ARCH}.tar.gz *)
+  artifacts:
+    paths:
+      - version.txt
+      - keybase-${ARCH}.tar.gz
+    expire_in: 3 hours
+
+build:alpine:amd:
+  variables:
+    ARCH: "amd64"
+  extends: .build:alpine
+  tags:
+    - native-amd64
+
+build:alpine:arm:
+  variables:
+    ARCH: "arm64"
+  extends: .build:alpine
+  tags:
+    - native-aarch64
+
+.build:ubuntu:
+  image: registry.gitlab.com/jitesoft/dockerfiles/go/ubuntu:latest
+  before_script:
+    - export CGO_ENABLED=1
+    - export GO15VENDOREXPERIMENT=1
+    - apt-get update
+    - apt-get install -y curl tar xz-utils gcc
+    - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
+    - echo ${VERSION} > version.txt
+  script:
+    - mkdir -p ${GOPATH}/src/github.com/keybase/client
+    - curl -L https://github.com/keybase/client/releases/download/${VERSION}/keybase-${VERSION}.tar.xz -o /tmp/keybase.tar.xz
+    - tar -Jxf /tmp/keybase.tar.xz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1
+    - BUILDMODE="-buildmode=pie"
+    - cd /usr/local/bin
+    - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/keybase
+    - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/redirector
+    - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/kbfsfuse
+    - cd ${CI_PROJECT_DIR}
+    - cp ubuntu/entrypoint /usr/local/bin
+    - $(cd /usr/local && tar -czf ${CI_PROJECT_DIR}/keybase-${ARCH}.tar.gz *)
+  artifacts:
+    paths:
+      - version.txt
+      - keybase-${ARCH}.tar.gz
+    expire_in: 3 hours
+
+build:ubuntu:amd:
+  variables:
+    ARCH: "amd64"
+  extends: .build:ubuntu
+  tags:
+    - native-amd64
+
+build:ubuntu:arm:
+  variables:
+    ARCH: "arm64"
+  extends: .build:ubuntu
+  tags:
+    - native-aarch64
+
+containerize:ubuntu:
+  stage: containerize
   image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
   variables:
     DOCKER_BUILDKIT: 1
@@ -22,8 +105,8 @@ build:
     - helper multipush quay.io/jitesoft/keybase:latest quay.io/jitesoft/keybase:${VERSION}
   tags: [ jitesoft, protected, buildx ]
 
-build:alpine:
-  stage: build
+containerize:alpine:
+  stage: containerize
   image: registry.gitlab.com/jitesoft/dockerfiles/misc:latest
   variables:
     DOCKER_BUILDKIT: 1
