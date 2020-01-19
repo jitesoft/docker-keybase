@@ -9,7 +9,10 @@ This image contains the [Keybase](https://keybase.io/) application running on ub
 ## Tags
 
 Tags follow the keybase version numbering standard (prefixed with `v`) and the latest version is also tagged `latest`.    
-Keybase is built from source for amd64 and arm64/aarch64
+Keybase is built from source for amd64 and arm64/aarch64.
+
+To make the image as tiny as possible, [UPX](https://upx.github.io/) have been utilized to compress the binaries used by keybase.  
+If you notice any compression issues, please report it in the [issue tracker](https://gitlab.com/jitesoft/dockerfiles/keybase/issues).
 
 ### Docker Hub
 
