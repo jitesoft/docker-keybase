@@ -18,4 +18,4 @@ RUN --mount=type=bind,source=./binaries,target=/tmp/bin \
 
 USER keybase
 ENTRYPOINT ["entrypoint"]
-CMD ["keyubase", "oneshot"]
+CMD ["keybase", "oneshot"]
