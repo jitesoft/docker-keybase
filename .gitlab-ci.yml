@@ -13,7 +13,7 @@ stages:
   before_script:
     - export CGO_ENABLED=1
     - export GO15VENDOREXPERIMENT=1
-    - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold xz upx
+    - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold xz
     - mkdir binaries
     - mkdir out
     - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
@@ -27,9 +27,6 @@ stages:
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/keybase
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/redirector
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/kbfsfuse
-    - upx -9 kbfsfuse
-    - upx -9 redirector
-    - upx -9 keybase
     - cd ${CI_PROJECT_DIR}
     - cp Alpine/entrypoint out/
     - $(cd out && tar -czf ${CI_PROJECT_DIR}/binaries/keybase-${ARCH}.tar.gz *)
@@ -59,7 +56,7 @@ build:alpine:arm:
     - export CGO_ENABLED=1
     - export GO15VENDOREXPERIMENT=1
     - apt-get update
-    - apt-get install -y curl tar xz-utils gcc wget upx
+    - apt-get install -y curl tar xz-utils gcc wget
     - mkdir binaries
     - mkdir out
     - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
@@ -73,9 +70,6 @@ build:alpine:arm:
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/keybase
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/redirector
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/kbfs/kbfsfuse
-    - upx -9 kbfsfuse
-    - upx -9 redirector
-    - upx -9 keybase
     - cd ${CI_PROJECT_DIR}
     - cp Ubuntu/entrypoint out/
     - $(cd out && tar -czf ${CI_PROJECT_DIR}/binaries/keybase-${ARCH}.tar.gz *)
