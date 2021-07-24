@@ -8,11 +8,15 @@ stages:
   - scan
   - notify
 
-.build:alpine:
+build:alpine:
+  parallel:
+    matrix:
+      - { ARCH: "arm64", GOARCH: "arm64", GO111MODULE: "auto" }
+      - { ARCH: "amd64", GOARCH: "amd64", GO111MODULE: "auto" }
   stage: build
   image: registry.gitlab.com/jitesoft/dockerfiles/go:latest
   before_script:
-    - export GO111MODULE=auto
+    - export GOOS=linux
     - export CGO_ENABLED=1
     - export GO15VENDOREXPERIMENT=1
     - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold xz
@@ -37,25 +41,14 @@ stages:
       - binaries
     expire_in: 3 hours
 
-build:alpine:amd:
-  variables:
-    ARCH: "amd64"
-  extends: .build:alpine
-  tags:
-    - native-amd64
-
-build:alpine:arm:
-  variables:
-    ARCH: "arm64"
-  extends: .build:alpine
-  tags:
-    - native-aarch64
-
-.build:ubuntu:
+build:ubuntu:
+  parallel:
+    matrix:
+      - { ARCH: "arm64", GOARCH: "arm64", GO111MODULE: "auto" }
+      - { ARCH: "amd64", GOARCH: "amd64", GO111MODULE: "auto" }
   stage: build
   image: registry.gitlab.com/jitesoft/dockerfiles/go/ubuntu:latest
   before_script:
-    - export GO111MODULE=auto
     - export CGO_ENABLED=1
     - export GO15VENDOREXPERIMENT=1
     - apt-get update
@@ -80,20 +73,6 @@ build:alpine:arm:
     paths:
       - binaries
     expire_in: 3 hours
-
-build:ubuntu:amd:
-  variables:
-    ARCH: "amd64"
-  extends: .build:ubuntu
-  tags:
-    - native-amd64
-
-build:ubuntu:arm:
-  variables:
-    ARCH: "arm64"
-  extends: .build:ubuntu
-  tags:
-    - native-aarch64
 
 containerize:ubuntu:
   stage: containerize
