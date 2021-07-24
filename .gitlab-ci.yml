@@ -16,8 +16,6 @@ build:alpine:
   stage: build
   image: registry.gitlab.com/jitesoft/dockerfiles/go:latest
   before_script:
-    - export GOOS=linux
-    - export CGO_ENABLED=1
     - export GO15VENDOREXPERIMENT=1
     - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold xz
     - mkdir binaries
@@ -49,7 +47,6 @@ build:ubuntu:
   stage: build
   image: registry.gitlab.com/jitesoft/dockerfiles/go/ubuntu:latest
   before_script:
-    - export CGO_ENABLED=1
     - export GO15VENDOREXPERIMENT=1
     - apt-get update
     - apt-get install -y curl tar xz-utils gcc wget
