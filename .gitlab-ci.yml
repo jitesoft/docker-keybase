@@ -16,18 +16,17 @@ build:alpine:
   stage: build
   image: registry.gitlab.com/jitesoft/dockerfiles/go:latest
   before_script:
-    - trap '' PIPE
     - export GO15VENDOREXPERIMENT=1
-    - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold xz jq
+    - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold jq
     - mkdir binaries
     - mkdir out
-    - VERSION=$(wget -qO- https://api.github.com/repos/keybase/client/releases | jq -r ".[].tag_name" | head -1)
-    - DL_URI=$(wget -qO- https://api.github.com/repos/keybase/client/releases | jq -r ".[].tarball_url" | head -1)
+    - VERSION=$(wget -qO- https://api.github.com/repos/keybase/client/releases | jq -r ".[].tag_name" | awk 'NR==1{print $1}')
+    - DL_URI=$(wget -qO- https://api.github.com/repos/keybase/client/releases | jq -r ".[].tarball_url" | awk 'NR==1{print $1}')
     - echo ${VERSION} > binaries/version.txt
   script:
     - mkdir -p ${GOPATH}/src/github.com/keybase/client
-    - curl -L "${DL_URI}" -o /tmp/keybase.tar.xz
-    - tar -Jxf /tmp/keybase.tar.xz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1
+    - curl -L "${DL_URI}" -o /tmp/keybase.tar.gz
+    - tar -xzf /tmp/keybase.tar.gz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1
     - BUILDMODE="-buildmode=pie"
     - cd out
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/keybase
@@ -51,15 +50,16 @@ build:ubuntu:
   before_script:
     - export GO15VENDOREXPERIMENT=1
     - apt-get update
-    - apt-get install -y curl tar xz-utils gcc wget
+    - apt-get install -y curl tar gcc wget
     - mkdir binaries
     - mkdir out
-    - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
+    - VERSION=$(wget -qO- https://api.github.com/repos/keybase/client/releases | jq -r ".[].tag_name" | awk 'NR==1{print $1}')
+    - DL_URI=$(wget -qO- https://api.github.com/repos/keybase/client/releases | jq -r ".[].tarball_url" | awk 'NR==1{print $1}')
     - echo ${VERSION} > binaries/version.txt
   script:
     - mkdir -p ${GOPATH}/src/github.com/keybase/client
-    - curl -L https://github.com/keybase/client/releases/download/${VERSION}/keybase-${VERSION}.tar.xz -o /tmp/keybase.tar.xz
-    - tar -Jxf /tmp/keybase.tar.xz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1
+    - curl -L "${DL_URI}" -o /tmp/keybase.tar.gz
+    - tar -xzf /tmp/keybase.tar.gz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1
     - BUILDMODE="-buildmode=pie"
     - cd out
     - go build -v -a -ldflags "-linkmode external -extldflags '-static' -s -w" ${BUILDMODE} -tags production github.com/keybase/client/go/keybase
