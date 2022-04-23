@@ -20,7 +20,7 @@ build:alpine:
     - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold xz
     - mkdir binaries
     - mkdir out
-    - VERSION=$(wget -qO- https://github.com/keybase/client/releases | grep -oP '(?<=releases\/tag\/)(.*?)(?=\">)' | awk 'NR==1{print $1}' | head -1)
+    - VERSION=$(wget -qO- https://api.github.com/repos/keybase/client/releases | jq -r ".[].tag_name" | head -1)
     - echo ${VERSION} > binaries/version.txt
   script:
     - mkdir -p ${GOPATH}/src/github.com/keybase/client
