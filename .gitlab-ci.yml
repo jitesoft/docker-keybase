@@ -16,6 +16,7 @@ build:alpine:
   stage: build
   image: registry.gitlab.com/jitesoft/dockerfiles/go:latest
   before_script:
+    - trap '' PIPE
     - export GO15VENDOREXPERIMENT=1
     - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold xz jq
     - mkdir binaries
