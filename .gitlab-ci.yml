@@ -21,10 +21,11 @@ build:alpine:
     - mkdir binaries
     - mkdir out
     - VERSION=$(wget -qO- https://api.github.com/repos/keybase/client/releases | jq -r ".[].tag_name" | head -1)
+    - DL_URI=$(wget -qO- https://api.github.com/repos/keybase/client/releases | jq -r ".[].tarball_url" | head -1)
     - echo ${VERSION} > binaries/version.txt
   script:
     - mkdir -p ${GOPATH}/src/github.com/keybase/client
-    - curl -L https://github.com/keybase/client/releases/download/${VERSION}/keybase-${VERSION}.tar.xz -o /tmp/keybase.tar.xz
+    - curl -L "${DL_URI}" -o /tmp/keybase.tar.xz
     - tar -Jxf /tmp/keybase.tar.xz -C "${GOPATH}/src/github.com/keybase/client" --strip-components=1
     - BUILDMODE="-buildmode=pie"
     - cd out
