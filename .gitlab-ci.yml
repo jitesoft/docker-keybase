@@ -17,7 +17,7 @@ build:alpine:
   image: registry.gitlab.com/jitesoft/dockerfiles/go:latest
   before_script:
     - export GO15VENDOREXPERIMENT=1
-    - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold xz
+    - apk add --no-cache grep wget gcc curl libstdc++ build-base binutils-gold xz jq
     - mkdir binaries
     - mkdir out
     - VERSION=$(wget -qO- https://api.github.com/repos/keybase/client/releases | jq -r ".[].tag_name" | head -1)
